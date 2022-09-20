@@ -35,11 +35,6 @@ const selectize = {
       type: "String",
     },
     {
-      name: "maxHeight",
-      label: "max-height px",
-      type: "Integer",
-    },
-    {
       name: "force_required",
       label: "Force required",
       sublabel:
@@ -107,15 +102,7 @@ const selectize = {
             nm
           )}').selectize();`
         )
-      )/* +
-      (attrs?.maxHeight
-        ? style(
-          `.select2-container--default .select2-dd-${text_attr(
-            nm
-          )} .select2-results>.select2-results__options {max-height: ${attrs?.maxHeight
-          }px;}`
-        )
-        : "")*/
+      )
     );
   },
 };
