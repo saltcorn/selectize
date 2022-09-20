@@ -100,7 +100,11 @@ const selectize = {
         domReady(
           `$('#input${text_attr(
             nm
-          )}').selectize();`
+          )}').selectize();         
+          document.getElementById('input${text_attr(
+            nm
+          )}').addEventListener('RefreshSelectOptions', (e) => { console.log("got signal!")}, false);
+        `
         )
       )
     );
