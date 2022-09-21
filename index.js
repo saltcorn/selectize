@@ -35,6 +35,11 @@ const selectize = {
       type: "String",
     },
     {
+      name: "maxHeight",
+      label: "max-height px",
+      type: "Integer",
+    },
+    {
       name: "force_required",
       label: "Force required",
       sublabel:
@@ -75,7 +80,7 @@ const selectize = {
     return (
       tags.select(
         {
-          class: `form-control ${cls} ${field.class || ""}`,
+          class: `form-control ${cls} ${field.class || ""} selectize-nm-${text_attr(nm)}`,
           "data-fieldname": field.form_name,
           name: text_attr(nm),
           onChange: attrs.onChange,
@@ -106,7 +111,17 @@ const selectize = {
           )}').addEventListener('RefreshSelectOptions', (e) => { console.log("got signal!")}, false);
         `
         )
-      )
+      ) +
+      (attrs?.maxHeight
+        ? style(
+          `.selectize-dropdown.selectize-nm-${text_attr(
+            nm
+          )} .selectize-dropdown-content {
+            max-height: ${attrs?.maxHeight
+          }px;            
+          } `
+        )
+        : "")
     );
   },
 };
