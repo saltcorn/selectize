@@ -108,7 +108,7 @@ const selectize = {
           )}').selectize();         
           document.getElementById('input${text_attr(
             nm
-          )}').addEventListener('RefreshSelectOptions', (e) => { console.log("got signal!")}, false);
+          )}').addEventListener('RefreshSelectOptions', (e) => { }, false);
         `
         )
       ) +
