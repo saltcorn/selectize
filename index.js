@@ -11,6 +11,7 @@ const {
 } = require("@saltcorn/markup/tags");
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
+const { features } = require("@saltcorn/data/db/state");
 
 const selectize = {
   /** @type {string} */
@@ -125,20 +126,47 @@ const selectize = {
     );
   },
 };
-
-const fieldviews = { selectize };
+const configuration_workflow = () =>
+  new Workflow({
+    steps: [
+      {
+        name: "everything",
+        form: async (context) => {
+          return new Form({
+            fields: [
+              {
+                name: "everything",
+                label: "Selectize everything",
+                sublabel: "Apply selectize everywhere possible",
+                type: "Bool",
+              },
+            ],
+          });
+        },
+      },
+    ],
+  });
+const fieldviews = () => ({ selectize });
 
 module.exports = {
   sc_plugin_api_version: 1,
   fieldviews,
+  configuration_workflow,
   plugin_name: "selectize",
   //viewtemplates: [require("./edit-nton")],
-  headers: [
+  headers: ({ everything }) => [
     {
       script: "/plugins/public/selectize/selectize.min.js",
     },
     {
       css: "/plugins/public/selectize/selectize.bootstrap5.css",
     },
+    ...everything ? [{
+      script: `/plugins/public/selectize${features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+        }/selectize_everything.js`,
+    }] : []
+
   ],
 };
