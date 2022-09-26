@@ -12,6 +12,8 @@ const {
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
 const { features } = require("@saltcorn/data/db/state");
+const Workflow = require("@saltcorn/data/models/workflow");
+const Form = require("@saltcorn/data/models/form");
 
 const selectize = {
   /** @type {string} */
