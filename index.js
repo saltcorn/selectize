@@ -161,7 +161,7 @@ module.exports = {
       script: "/plugins/public/selectize/selectize.min.js",
     },
     {
-      css: "/plugins/public/selectize/selectize.bootstrap5.css",
+      css: `/plugins/public/selectize@${require("./package.json").version}/selectize.bootstrap5.css`,
     },
     ...everything ? [{
       script: `/plugins/public/selectize${features?.version_plugin_serve_path
