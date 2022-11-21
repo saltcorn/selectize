@@ -80,35 +80,43 @@ const selectize = {
         }) + span({ class: "ml-m1" }, "v")
       );
     //console.log("select2 attrs", attrs);
+
+    let opts = select_options(
+      v,
+      field,
+      (attrs || {}).force_required,
+      (attrs || {}).neutral_label
+    );
+    if (attrs.isFilter && field.required)
+      opts = `<option value="">${attrs?.neutral_label || ""}</option>` + opts;
     return (
       tags.select(
         {
-          class: `form-control ${cls} ${field.class || ""} selectize-nm-${text_attr(nm)}`,
+          class: `form-control ${cls} ${
+            field.class || ""
+          } selectize-nm-${text_attr(nm)}`,
           "data-fieldname": field.form_name,
           name: text_attr(nm),
           onChange: attrs.onChange,
           id: `input${text_attr(nm)}`,
           ...(attrs?.dynamic_where
             ? {
-              "data-selected": v,
-              "data-fetch-options": encodeURIComponent(
-                JSON.stringify(attrs?.dynamic_where)
-              ),
-            }
+                "data-selected": v,
+                "data-fetch-options": encodeURIComponent(
+                  JSON.stringify(attrs?.dynamic_where)
+                ),
+              }
             : {}),
         },
-        select_options(
-          v,
-          field,
-          (attrs || {}).force_required,
-          (attrs || {}).neutral_label
-        )
+        opts
       ) +
       script(
         domReady(
-          `$('#input${text_attr(
-            nm
-          )}').selectize();         
+          `$('#input${text_attr(nm)}').selectize(${
+            attrs?.isFilter || field.required
+              ? `{plugins: ["remove_button"],}`
+              : ""
+          });         
           document.getElementById('input${text_attr(
             nm
           )}').addEventListener('RefreshSelectOptions', (e) => { }, false);
@@ -117,13 +125,12 @@ const selectize = {
       ) +
       (attrs?.maxHeight
         ? style(
-          `.selectize-dropdown.selectize-nm-${text_attr(
-            nm
-          )} .selectize-dropdown-content {
-            max-height: ${attrs?.maxHeight
-          }px;            
+            `.selectize-dropdown.selectize-nm-${text_attr(
+              nm
+            )} .selectize-dropdown-content {
+            max-height: ${attrs?.maxHeight}px;            
           } `
-        )
+          )
         : "")
     );
   },
@@ -161,14 +168,20 @@ module.exports = {
       script: "/plugins/public/selectize/selectize.min.js",
     },
     {
-      css: `/plugins/public/selectize@${require("./package.json").version}/selectize.bootstrap5.css`,
+      css: `/plugins/public/selectize@${
+        require("./package.json").version
+      }/selectize.bootstrap5.css`,
     },
-    ...everything ? [{
-      script: `/plugins/public/selectize${features?.version_plugin_serve_path
-        ? "@" + require("./package.json").version
-        : ""
-        }/selectize_everything.js`,
-    }] : []
-
+    ...(everything
+      ? [
+          {
+            script: `/plugins/public/selectize${
+              features?.version_plugin_serve_path
+                ? "@" + require("./package.json").version
+                : ""
+            }/selectize_everything.js`,
+          },
+        ]
+      : []),
   ],
 };
