@@ -89,6 +89,7 @@ const selectize = {
     );
     if (attrs.isFilter && field.required)
       opts = `<option value="">${attrs?.neutral_label || ""}</option>` + opts;
+    const noChange = attrs.isFilter && attrs.dynamic_where;
     return (
       tags.select(
         {
@@ -97,7 +98,7 @@ const selectize = {
           } selectize-nm-${text_attr(nm)}`,
           "data-fieldname": field.form_name,
           name: text_attr(nm),
-          onChange: attrs.onChange,
+          onChange: !noChange && attrs.onChange,
           id: `input${text_attr(nm)}`,
           ...(attrs?.dynamic_where
             ? {
