@@ -93,7 +93,7 @@ const selectize = {
     return (
       tags.select(
         {
-          class: `form-control ${cls} ${
+          class: `form-control scfilter ${cls} ${
             field.class || ""
           } selectize-nm-${text_attr(nm)}`,
           "data-fieldname": field.form_name,
