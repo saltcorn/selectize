@@ -1,6 +1,6 @@
 {
   "name": "@saltcorn/selectize",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "Typeahead fieldviews based on seletize.js",
   "main": "index.js",
   "dependencies": {
