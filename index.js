@@ -213,15 +213,17 @@ const search_or_create_selectize = {
    * @param {*} field
    * @returns {object}
    */
-  run: (nm, v, attrs, cls, reqd, field) => {
+  run: (nm0, v, attrs, cls, reqd, field) => {
+    const rndid = Math.floor(Math.random() * 16777215).toString(16);
+    const nm = nm0 + rndid;
     return (
       tags.select(
         {
           class: `form-control form-select ${cls} ${field.class || ""}`,
           "data-fieldname": field.form_name,
 
-          name: text_attr(nm),
-          id: `input${text_attr(nm)}`,
+          name: text_attr(nm0),
+          id: `input${nm}`,
           disabled: attrs.disabled,
           readonly: attrs.readonly,
           onChange: attrs.onChange,
@@ -247,14 +249,12 @@ const search_or_create_selectize = {
       ) +
       script(
         domReady(
-          `$('#input${text_attr(nm)}').selectize(${
+          `$('#input${nm}').selectize(${
             attrs?.isFilter || field.required
               ? `{plugins: ["remove_button"],}`
               : ""
           });         
-        document.getElementById('input${text_attr(
-          nm
-        )}').addEventListener('RefreshSelectOptions', (e) => { }, false);
+        document.getElementById('input${nm}').addEventListener('RefreshSelectOptions', (e) => { }, false);
 
         window.soc_process_${nm} = (elem) => ()=> {
           $.ajax('/api/${field.reftable_name}', {
@@ -270,7 +270,7 @@ const search_or_create_selectize = {
                   ? 1
                   : -1
                 );
-              const e = $('#input${text_attr(nm)}')
+              const e = $('#input${nm}')
               e.selectize()[0].selectize.clearOptions(true);
               e.selectize()[0].selectize.addOption(dataOptions);
               e.selectize()[0].selectize.setValue(res.success[res.success.length-1].id);
