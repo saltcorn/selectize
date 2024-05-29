@@ -40,6 +40,11 @@ const selectize = {
       type: "String",
     },
     {
+      name: "ajax",
+      label: "Ajax fetch options",
+      type: "Bool",
+    },
+    {
       name: "maxHeight",
       label: "max-height px",
       type: "Integer",
@@ -82,13 +87,21 @@ const selectize = {
         }) + span({ class: "ml-m1" }, "v")
       );
     //console.log("select2 attrs", attrs);
-
-    let opts = select_options(
-      v,
-      field,
-      (attrs || {}).force_required,
-      (attrs || {}).neutral_label
-    );
+    let opts = [];
+    if (!attrs.ajax)
+      opts = select_options(
+        v,
+        field,
+        (attrs || {}).force_required,
+        (attrs || {}).neutral_label
+      );
+    else
+      opts = select_options(
+        v,
+        { ...field, options: field.options.filter((o) => o.value == v) },
+        (attrs || {}).force_required,
+        (attrs || {}).neutral_label
+      );
     if (attrs.isFilter && field.required)
       opts = `<option value="">${attrs?.neutral_label || ""}</option>` + opts;
     const noChange = attrs.isFilter && attrs.dynamic_where;
@@ -115,10 +128,34 @@ const selectize = {
       ) +
       script(
         domReady(
-          `$('#input${text_attr(nm)}').selectize(${
-            attrs?.isFilter || field.required
-              ? `{plugins: ["remove_button"],}`
-              : ""
+          `$('#input${text_attr(nm)}').selectize({
+            ${
+              attrs?.isFilter || field.required
+                ? `plugins: ["remove_button"],`
+                : ""
+            }
+            ${
+              attrs?.ajax
+                ? `load: function(query, callback) {
+if (!query.length || query.length<2) return callback();
+   $.ajax({
+    url: '/api/${field.reftable_name}?${field.attributes.summary_field}='+query+'&approximate=true',
+    type: 'GET',
+    dataType: 'json',
+    //data: { json: JSON.stringify(countries) },
+
+    error: function(err) { console.log(err); },
+
+  success: function(data) {
+    if(!data || !data.success) return [];
+    const options = data.success.map(item=>({text: item.${field.attributes.summary_field}, value: item.id }))
+    callback(options)
+    }
+              });
+            }`
+                : ""
+            }
+          
           });         
           document.getElementById('input${text_attr(
             nm
