@@ -139,7 +139,9 @@ const selectize = {
                 ? `load: function(query, callback) {
 if (!query.length || query.length<2) return callback();
    $.ajax({
-    url: '/api/${field.reftable_name}?${field.attributes.summary_field}='+query+'&approximate=true',
+    url: '/api/${field.reftable_name}?${
+                    field.attributes.summary_field
+                  }='+query+'&approximate=true',
     type: 'GET',
     dataType: 'json',
     //data: { json: JSON.stringify(countries) },
@@ -148,7 +150,13 @@ if (!query.length || query.length<2) return callback();
 
   success: function(data) {
     if(!data || !data.success) return [];
-    const options = data.success.map(item=>({text: item.${field.attributes.summary_field}, value: item.id }))
+    const options = data.success.map(item=>({text: ${
+      attrs.label_formula
+        ? `new Function('{'+Object.keys(item).join(",")+'}', "return " +${JSON.stringify(
+            attrs.label_formula
+          )})(item)`
+        : `item.${field.attributes.summary_field}`
+    }, value: item.id }))
     callback(options)
     }
               });
