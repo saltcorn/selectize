@@ -98,7 +98,12 @@ const selectize = {
     else
       opts = select_options(
         v,
-        { ...field, options: field.options.filter((o) => o.value == v) },
+        {
+          ...field,
+          options: (field.options || []).filter(
+            (o) => o.value == v || o.value === ""
+          ),
+        },
         (attrs || {}).force_required,
         (attrs || {}).neutral_label
       );
