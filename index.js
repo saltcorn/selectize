@@ -362,4 +362,5 @@ module.exports = {
         ]
       : []),
   ],
+  ready_for_mobile: true,
 };
