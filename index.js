@@ -133,7 +133,9 @@ const selectize = {
       ) +
       script(
         domReady(
-          `$('#input${text_attr(nm)}').selectize({
+          `const isWeb = typeof parent.window.saltcorn?.markup === "undefined";
+           const hasCapacitor = typeof parent.window.saltcorn?.mobileApp !== "undefined";
+$('#input${text_attr(nm)}').selectize({
             ${
               attrs?.isFilter || field.required
                 ? `plugins: ["remove_button"],`
@@ -141,8 +143,9 @@ const selectize = {
             }
             ${
               attrs?.ajax
-                ? `load: function(query, callback) {
+                ? `load: async function(query, callback) {
 if (!query.length || query.length<2) return callback();
+  if (isWeb) {
    $.ajax({
     url: '/api/${field.reftable_name}?${
                     field.attributes.summary_field
@@ -164,7 +167,32 @@ if (!query.length || query.length<2) return callback();
     }, value: item.id }))
     callback(options)
     }
-              });
+              })
+    }
+    else if (hasCapacitor) {
+      const response = await parent.window.saltcorn.mobileApp.api.apiCall({
+        method: 'GET',
+        path: '/api/${field.reftable_name}?${
+                    field.attributes.summary_field
+                  }='+query+'&approximate=true',
+        responseType: "json",
+      });
+      const data = response.data;
+      if(!data || !data.success) callback([]);
+      else {
+        const options = data.success.map(item=>({text: ${
+          attrs.label_formula
+            ? `new Function('{'+Object.keys(item).join(",")+'}', "return " +${JSON.stringify(
+                attrs.label_formula
+              )})(item)`
+            : `item.${field.attributes.summary_field}`
+        }, value: item.id }));
+        callback(options)
+      }
+    }
+    else {
+      console.error("No API available")
+    }
             }`
                 : ""
             }
