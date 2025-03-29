@@ -27,7 +27,12 @@ const selectize = {
   /**
    * @type {object[]}
    */
-
+  fill_options_restrict(field, v) {
+    if (field?.attributes?.ajax) {
+      const pk = Table.findOne(field.reftable_name)?.pk_name;
+      if (pk) return { [pk]: v || null };
+    }
+  },
   configFields: () => [
     {
       name: "neutral_label",
