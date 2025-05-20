@@ -11,11 +11,23 @@ const {
 } = require("@saltcorn/markup/tags");
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
-const { features } = require("@saltcorn/data/db/state");
+const { features, getState } = require("@saltcorn/data/db/state");
 const Workflow = require("@saltcorn/data/models/workflow");
 const Table = require("@saltcorn/data/models/table");
 const View = require("@saltcorn/data/models/view");
 const Form = require("@saltcorn/data/models/form");
+
+const bsBgColor = () => {
+  const state = getState();
+  if (state.plugin_cfgs) {
+    let anyBsThemeCfg = state.plugin_cfgs["any-bootstrap-theme"];
+    if (!anyBsThemeCfg)
+      anyBsThemeCfg = state.plugin_cfgs["@saltcorn/any-bootstrap-theme"];
+    if (anyBsThemeCfg?.backgroundColorDark)
+      return anyBsThemeCfg.backgroundColorDark;
+  }
+  return "";
+};
 
 const selectize = {
   /** @type {string} */
@@ -138,8 +150,54 @@ const selectize = {
       ) +
       script(
         domReady(
-          `const isWeb = typeof parent.window.saltcorn?.markup === "undefined";
-           const hasCapacitor = typeof parent.window.saltcorn?.mobileApp !== "undefined";
+          `
+const addFiveToColor = (hexColor) => {
+  const decimalColor = parseInt(hexColor.replace("#", ""), 16);
+  let red = (decimalColor >> 16) & 0xff;
+  let green = (decimalColor >> 8) & 0xff;
+  let blue = decimalColor & 0xff;
+  red = Math.min(255, red + 5);
+  green = Math.min(255, green + 5);
+  blue = Math.min(255, blue + 5);
+  return \`#\${((red << 16) | (green << 8) | blue)
+    .toString(16)
+    .padStart(6, "0")}\`;
+}
+
+const getDarkStyle = (bg) => {
+  return \`
+  .selectize-input {
+    background-color: \${bg} !important;
+    color: #fff !important;
+  }
+
+  .selectize-control {
+    background-color: \${bg} !important;
+    color: #fff !important;
+  }
+
+  .selectize-dropdown  {
+    background-color: \${bg} !important;
+    color: #fff !important;
+  }
+  .selectize-dropdown-content .option.active {
+    background-color: \${addFiveToColor(bg)} !important;
+    color: #fff !important;
+  }
+\`;
+};
+
+// try tabler, then bootstrap, then default
+const darkBg = window._sc_lightmode==="dark" ? 
+  (getComputedStyle(document.body).getPropertyValue('--tblr-body-bg').trim() || 
+    "${bsBgColor()}") : null; 
+if (darkBg) {
+  const style = document.createElement('style');
+  style.textContent = getDarkStyle(darkBg);
+  document.head.appendChild(style);
+}
+const isWeb = typeof parent.window.saltcorn?.markup === "undefined";
+const hasCapacitor = typeof parent.window.saltcorn?.mobileApp !== "undefined";
 $('#input${text_attr(nm)}').selectize({
             ${
               attrs?.isFilter || field.required
