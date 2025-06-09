@@ -434,7 +434,9 @@ module.exports = {
   //viewtemplates: [require("./edit-nton")],
   headers: ({ everything }) => [
     {
-      script: "/plugins/public/selectize/selectize.min.js",
+      script: `/plugins/public/selectize@${
+        require("./package.json").version
+      }/selectize.min.js`,
     },
     {
       css: `/plugins/public/selectize@${
